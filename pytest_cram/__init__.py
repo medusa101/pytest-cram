@@ -40,6 +40,7 @@ class CramItem(pytest.Item, pytest.File):
     def __init__(self, path, parent):
         pytest.Item.__init__(self, path, parent)
         pytest.File.__init__(self, path, parent)
+        self.parent = parent
         self.add_marker("cram")
         tmpdir_factory = parent.config._tmpdirhandler
         name = re.sub("[\W]", "_", self.name)
@@ -52,7 +53,7 @@ class CramItem(pytest.Item, pytest.File):
         with self.tmpdir.as_cwd():
             os.environ['CRAMTMP'] = str(self.tmpdir)
             ins, outs, diff = cram.testfile(b(str(self.fspath)),
-                                            shell=pytest.config.option.shell)
+                                            shell=self.parent.config.option.shell)
         del os.environ['CRAMTMP']
 
         if outs is None and len(diff) == 0:
